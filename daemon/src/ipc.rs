@@ -233,15 +233,7 @@ async fn process_request(request: Request, queue: &MergeQueue) -> Response {
 
         Request::SessionEnd { session_id } => {
             debug!("Session ended: {}", session_id);
-            if let Err(e) = queue.clean_session(&session_id).await {
-                error!("Failed to clean session {}: {}", session_id, e);
-                Response::Error {
-                    status: "ERROR",
-                    error: e.to_string(),
-                }
-            } else {
-                Response::Ok { status: "OK" }
-            }
+            Response::Ok { status: "OK" }
         }
 
         Request::Shutdown => {

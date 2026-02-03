@@ -235,7 +235,7 @@ impl Merger {
 
             // Get the path from any of the conflict entries
             if let Some(entry) = conflict.our.or(conflict.their).or(conflict.ancestor) {
-                if let Ok(path) = std::str::from_utf8(&entry.path) {
+                if let Some(path) = std::str::from_utf8(&entry.path).ok() {
                     conflicts.push(path.to_string());
                 }
             }

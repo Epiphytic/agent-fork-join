@@ -118,19 +118,6 @@ impl StateManager {
         Ok(())
     }
 
-    /// Delete all entries for a session
-    pub async fn delete_session_entries(&self, session_id: &str) -> DaemonResult<()> {
-        let conn = self.conn.lock().await;
-
-        conn.execute(
-            "DELETE FROM queue_entries WHERE session_id = ?1",
-            params![session_id],
-        )?;
-
-        debug!("Deleted entries for session {}", session_id);
-        Ok(())
-    }
-
     /// Load all pending entries (for recovery)
     pub async fn load_pending_entries(&self) -> DaemonResult<Vec<QueueEntry>> {
         let conn = self.conn.lock().await;

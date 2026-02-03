@@ -246,20 +246,6 @@ impl MergeQueue {
         }
     }
 
-    /// Clean up session entries
-    pub async fn clean_session(&self, session_id: &str) -> DaemonResult<()> {
-        let mut queue = self.queue.lock().await;
-
-        // Remove from memory
-        queue.retain(|e| e.session_id != session_id);
-
-        // Remove from persistence
-        self.state_manager.delete_session_entries(session_id).await?;
-
-        info!("Cleaned up session {}", session_id);
-        Ok(())
-    }
-
     /// Main processing loop
     pub async fn process_loop(&self) {
         loop {
@@ -319,9 +305,6 @@ impl MergeQueue {
                     Ok(MergeResult::Success { commit_sha }) => {
                         info!("Merge succeeded for agent {}: {}", e.agent_id, commit_sha);
                         e.status = EntryStatus::Merged;
-                        if let Err(err) = self.state_manager.record_merge(&e.id, &e.agent_id, &e.session_id, &commit_sha).await {
-                             error!("Failed to record merge history: {}", err);
-                        }
                     }
                     Ok(MergeResult::Conflict { files }) => {
                         warn!("Merge conflict for agent {}: {:?}", e.agent_id, files);
